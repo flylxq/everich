@@ -1,0 +1,47 @@
+$font-stack: 微软雅黑, "Times New Roman", sans-serif;
+$font-color: rgba(32, 32, 32, .97);
+$border-color: rgba(64, 64, 64, .9);
+$basic-border: 1px solid $border-color;
+$basic-shadow: 5px 5px 5px $border-color;
+$theme-color: rgba(165, 42, 42, .75);
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: $font-stack;
+  font-size: 15px;
+  color: $font-color;
+  height: 100%;
+}
+
+.container {
+  margin-top: 5px;
+  min-height: 100%;
+  border: $basic-border;
+  border-radius: 5px;
+  box-shadow: $basic-shadow;
+}
+
+.page-title {
+  font-size: 30px;
+  text-align: center;
+  padding: 5px 10px;
+}
+
+.table {
+  thead {
+    th {
+      text-align: center;
+    }
+  }
+  tbody {
+    td {
+      > button.btn {
+        padding: 3px 6px;
+        margin: 0 3px;
+      }
+    }
+  }
+}
