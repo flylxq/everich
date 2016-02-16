@@ -67,9 +67,11 @@
 
 	var _Table = __webpack_require__(161);
 
+	var _Dialog = __webpack_require__(406);
+
 	var _reactBootstrap = __webpack_require__(162);
 
-	var _reactNotificationSystem = __webpack_require__(406);
+	var _reactNotificationSystem = __webpack_require__(407);
 
 	var _reactNotificationSystem2 = _interopRequireDefault(_reactNotificationSystem);
 
@@ -77,11 +79,7 @@
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-	/**
-	 *
-	 */
-
-	__webpack_require__(413);
+	__webpack_require__(414);
 
 	/**
 	 * key: key's name in source table
@@ -90,6 +88,10 @@
 	 * type: key's type for input, default is text
 	 * @type {*[]}
 	 */
+	/**
+	 *
+	 */
+
 	var CLIENT_SCHEMA = [{
 	    key: 'code',
 	    label: '编号',
@@ -131,10 +133,12 @@
 	            client: this._getEmptyClient(),
 	            status: '',
 	            showModal: false,
+	            dialog: {},
 	            data: [{ id: 1, code: '001', name: 'test1', address: 'address1', contact: 'contact1' }, { id: 2, code: '002', name: 'test2', address: 'address2', contact: 'contact2' }]
 	        };
 	    },
 	    _notificationSystem: null,
+	    _dialog: null,
 	    _initAjax: function _initAjax() {
 	        var self = this;
 	        $.ajaxSetup({
@@ -176,7 +180,9 @@
 	    _deleteClient: function _deleteClient(client) {
 	        var dao = this.props.dao;
 
-	        dao.delete(client.id);
+	        this._dialog.confirm('Are you sure to remove the client' + client.name + ' which could not recover?', function () {
+	            dao.delete(client.id);
+	        });
 	    },
 	    _addClient: function _addClient() {
 	        var client = this._getEmptyClient();
@@ -213,6 +219,7 @@
 	    },
 	    componentDidMount: function componentDidMount() {
 	        this._notificationSystem = this.refs.notificationSystem;
+	        this._dialog = this.refs.dialog;
 	    },
 	    render: function render() {
 	        var _this = this;
@@ -226,6 +233,7 @@
 	        var data = _state2.data;
 	        var status = _state2.status;
 	        var showModal = _state2.showModal;
+	        var dialog = _state2.dialog;
 
 	        var inputNodes = schema.map(function (header, index) {
 	            return React.createElement(_reactBootstrap.Input, { key: index,
@@ -297,17 +305,18 @@
 	                    null,
 	                    React.createElement(
 	                        _reactBootstrap.Button,
-	                        { bsSize: 'medium', onClick: this._cancel },
+	                        { onClick: this._cancel },
 	                        '取消'
 	                    ),
 	                    React.createElement(
 	                        _reactBootstrap.Button,
-	                        { bsSize: 'medium', bsStyle: 'primary', onClick: this._confirm },
+	                        { bsStyle: 'primary', onClick: this._confirm },
 	                        '确认'
 	                    )
 	                )
 	            ),
-	            React.createElement(_reactNotificationSystem2.default, { ref: 'notificationSystem' })
+	            React.createElement(_reactNotificationSystem2.default, { ref: 'notificationSystem' }),
+	            React.createElement(_Dialog.Dialog, { ref: 'dialog', dialog: dialog })
 	        );
 	    }
 	});
@@ -37190,11 +37199,120 @@
 /* 406 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.Dialog = undefined;
+
+	var _react = __webpack_require__(2);
+
+	var React = _interopRequireWildcard(_react);
+
+	var _reactBootstrap = __webpack_require__(162);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	/**
+	 *
+	 */
+
+	var Dialog = exports.Dialog = React.createClass({
+	    displayName: 'Dialog',
+
+	    getInitialState: function getInitialState() {
+	        var _props$dialog = this.props.dialog;
+	        var show = _props$dialog.show;
+	        var message = _props$dialog.message;
+	        var type = _props$dialog.type;
+	        var callback = _props$dialog.callback;
+
+	        return {
+	            show: show || false,
+	            message: message || '',
+	            type: type || 'alert',
+	            callback: callback || null
+	        };
+	    },
+	    alert: function alert(message, callback) {
+	        this.setState({
+	            show: true,
+	            message: message,
+	            type: 'alert',
+	            callback: callback
+	        });
+	    },
+	    confirm: function confirm(message, callback) {
+	        this.setState({
+	            show: true,
+	            message: message,
+	            type: 'confirm',
+	            callback: callback
+	        });
+	    },
+	    _confirm: function _confirm() {
+	        this.state.callback();
+	        this.setState({ show: false });
+	    },
+	    _cancel: function _cancel() {
+	        this.setState({ show: false });
+	    },
+	    componentDidMount: function componentDidMount() {
+	        var self = this;
+	        $(window).on('keypress', function (event) {
+	            if (self.state.show && event.keyCode === 13) {
+	                self._confirm();
+	            }
+	        });
+	    },
+	    render: function render() {
+	        var _state = this.state;
+	        var show = _state.show;
+	        var type = _state.type;
+	        var message = _state.message;
+
+	        var cancelNode = type === 'confirm' ? React.createElement(
+	            _reactBootstrap.Button,
+	            { onClick: this._cancel },
+	            '取消'
+	        ) : null;
+	        return React.createElement(
+	            _reactBootstrap.Modal,
+	            { show: show,
+	                backdrop: 'static',
+	                enforceFocus: true,
+	                keyboard: false },
+	            React.createElement(
+	                _reactBootstrap.Modal.Body,
+	                null,
+	                message
+	            ),
+	            React.createElement(
+	                _reactBootstrap.Modal.Footer,
+	                null,
+	                React.createElement(
+	                    _reactBootstrap.Button,
+	                    { bsStyle: 'primary', onClick: this._confirm },
+	                    '确认'
+	                ),
+	                cancelNode
+	            )
+	        );
+	    }
+	});
+
+	//# sourceMappingURL=Dialog.js.map
+
+/***/ },
+/* 407 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var React = __webpack_require__(2);
-	var merge = __webpack_require__(407);
-	var NotificationContainer = __webpack_require__(408);
-	var Constants = __webpack_require__(410);
-	var Styles = __webpack_require__(412);
+	var merge = __webpack_require__(408);
+	var NotificationContainer = __webpack_require__(409);
+	var Constants = __webpack_require__(411);
+	var Styles = __webpack_require__(413);
 
 	var NotificationSystem = React.createClass({displayName: "NotificationSystem",
 
@@ -37400,7 +37518,7 @@
 
 
 /***/ },
-/* 407 */
+/* 408 */
 /***/ function(module, exports) {
 
 	/* eslint-disable no-unused-vars */
@@ -37445,12 +37563,12 @@
 
 
 /***/ },
-/* 408 */
+/* 409 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(2);
-	var NotificationItem = __webpack_require__(409);
-	var Constants = __webpack_require__(410);
+	var NotificationItem = __webpack_require__(410);
+	var Constants = __webpack_require__(411);
 
 	var NotificationContainer = React.createClass({displayName: "NotificationContainer",
 
@@ -37506,14 +37624,14 @@
 
 
 /***/ },
-/* 409 */
+/* 410 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(159);
-	var Constants = __webpack_require__(410);
-	var Helpers = __webpack_require__(411);
-	var merge = __webpack_require__(407);
+	var Constants = __webpack_require__(411);
+	var Helpers = __webpack_require__(412);
+	var merge = __webpack_require__(408);
 
 	/* From Modernizr */
 	var whichTransitionEvent = function() {
@@ -37831,7 +37949,7 @@
 
 
 /***/ },
-/* 410 */
+/* 411 */
 /***/ function(module, exports) {
 
 	var CONSTANTS = {
@@ -37871,7 +37989,7 @@
 
 
 /***/ },
-/* 411 */
+/* 412 */
 /***/ function(module, exports) {
 
 	var Helpers = {
@@ -37903,7 +38021,7 @@
 
 
 /***/ },
-/* 412 */
+/* 413 */
 /***/ function(module, exports) {
 
 	// Used for calculations
@@ -38166,16 +38284,16 @@
 
 
 /***/ },
-/* 413 */
+/* 414 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(414);
+	var content = __webpack_require__(415);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(416)(content, {});
+	var update = __webpack_require__(417)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -38192,10 +38310,10 @@
 	}
 
 /***/ },
-/* 414 */
+/* 415 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(415)();
+	exports = module.exports = __webpack_require__(416)();
 	// imports
 
 
@@ -38206,7 +38324,7 @@
 
 
 /***/ },
-/* 415 */
+/* 416 */
 /***/ function(module, exports) {
 
 	/*
@@ -38262,7 +38380,7 @@
 
 
 /***/ },
-/* 416 */
+/* 417 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*

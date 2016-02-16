@@ -6,6 +6,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import DAO from '../controller/DAO'
 import { ManageTable } from '../components/Table'
+import { Dialog } from '../components/Dialog'
 import { Button, Input, Modal } from 'react-bootstrap'
 import NotificationSystem from 'react-notification-system'
 
@@ -57,10 +58,12 @@ let Client = React.createClass({
             client: this._getEmptyClient(),
             status: '',
             showModal: false,
+            dialog: {},
             data: [{id: 1, code: '001', name: 'test1', address: 'address1', contact: 'contact1'},{id: 2, code: '002', name: 'test2', address: 'address2', contact: 'contact2'},]
         }
     },
     _notificationSystem: null,
+    _dialog: null,
     _initAjax: function() {
         let self = this
         $.ajaxSetup({
@@ -99,7 +102,9 @@ let Client = React.createClass({
     },
     _deleteClient: function(client) {
         let { dao } = this.props
-        dao.delete(client.id)
+        this._dialog.confirm('Are you sure to remove the client' + client.name + ' which could not recover?', function(){
+            dao.delete(client.id)
+        })
     },
     _addClient: function() {
         let client = this._getEmptyClient()
@@ -132,10 +137,11 @@ let Client = React.createClass({
     },
     componentDidMount: function() {
         this._notificationSystem = this.refs.notificationSystem
+        this._dialog = this.refs.dialog
     },
     render: function() {
         let { schema, tableAdmin, tableIndex } = this.props
-        let { client, data, status, showModal } = this.state
+        let { client, data, status, showModal, dialog } = this.state
 
         let inputNodes = schema.map((header, index) => (
             <Input key = {index}
@@ -180,11 +186,12 @@ let Client = React.createClass({
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button bsSize = 'medium' onClick = {this._cancel}>取消</Button>
-                        <Button bsSize = 'medium' bsStyle = 'primary' onClick = {this._confirm}>确认</Button>
+                        <Button onClick = {this._cancel}>取消</Button>
+                        <Button bsStyle = 'primary' onClick = {this._confirm}>确认</Button>
                     </Modal.Footer>
                 </Modal>
                 <NotificationSystem ref = 'notificationSystem'></NotificationSystem>
+                <Dialog ref = 'dialog' dialog = {dialog}></Dialog>
             </div>
         )
     }

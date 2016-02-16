@@ -14,6 +14,8 @@ var _DAO2 = _interopRequireDefault(_DAO);
 
 var _Table = require('../components/Table');
 
+var _Dialog = require('../components/Dialog');
+
 var _reactBootstrap = require('react-bootstrap');
 
 var _reactNotificationSystem = require('react-notification-system');
@@ -24,10 +26,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-/**
- *
- */
-
 require('../../stylesheets/client.scss');
 
 /**
@@ -37,6 +35,10 @@ require('../../stylesheets/client.scss');
  * type: key's type for input, default is text
  * @type {*[]}
  */
+/**
+ *
+ */
+
 var CLIENT_SCHEMA = [{
     key: 'code',
     label: '编号',
@@ -78,10 +80,12 @@ var Client = React.createClass({
             client: this._getEmptyClient(),
             status: '',
             showModal: false,
+            dialog: {},
             data: [{ id: 1, code: '001', name: 'test1', address: 'address1', contact: 'contact1' }, { id: 2, code: '002', name: 'test2', address: 'address2', contact: 'contact2' }]
         };
     },
     _notificationSystem: null,
+    _dialog: null,
     _initAjax: function _initAjax() {
         var self = this;
         $.ajaxSetup({
@@ -123,7 +127,9 @@ var Client = React.createClass({
     _deleteClient: function _deleteClient(client) {
         var dao = this.props.dao;
 
-        dao.delete(client.id);
+        this._dialog.confirm('Are you sure to remove the client' + client.name + ' which could not recover?', function () {
+            dao.delete(client.id);
+        });
     },
     _addClient: function _addClient() {
         var client = this._getEmptyClient();
@@ -160,6 +166,7 @@ var Client = React.createClass({
     },
     componentDidMount: function componentDidMount() {
         this._notificationSystem = this.refs.notificationSystem;
+        this._dialog = this.refs.dialog;
     },
     render: function render() {
         var _this = this;
@@ -173,6 +180,7 @@ var Client = React.createClass({
         var data = _state2.data;
         var status = _state2.status;
         var showModal = _state2.showModal;
+        var dialog = _state2.dialog;
 
         var inputNodes = schema.map(function (header, index) {
             return React.createElement(_reactBootstrap.Input, { key: index,
@@ -244,17 +252,18 @@ var Client = React.createClass({
                     null,
                     React.createElement(
                         _reactBootstrap.Button,
-                        { bsSize: 'medium', onClick: this._cancel },
+                        { onClick: this._cancel },
                         '取消'
                     ),
                     React.createElement(
                         _reactBootstrap.Button,
-                        { bsSize: 'medium', bsStyle: 'primary', onClick: this._confirm },
+                        { bsStyle: 'primary', onClick: this._confirm },
                         '确认'
                     )
                 )
             ),
-            React.createElement(_reactNotificationSystem2.default, { ref: 'notificationSystem' })
+            React.createElement(_reactNotificationSystem2.default, { ref: 'notificationSystem' }),
+            React.createElement(_Dialog.Dialog, { ref: 'dialog', dialog: dialog })
         );
     }
 });

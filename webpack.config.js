@@ -9,8 +9,8 @@ module.exports = {
         Client: ['./javascripts/client/Client.js']
     },
     output: {
-        path: path.join(__dirname, 'public/javascripts/'),
-        filename: '[name].compile.js'
+        path: path.join(__dirname, 'public/dist/'),
+        filename: '[name].js'
     },
     module: {
         loaders: [
