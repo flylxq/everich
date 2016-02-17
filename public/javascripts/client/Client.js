@@ -71,7 +71,7 @@ var Client = React.createClass({
             schema: CLIENT_SCHEMA,
             tableAdmin: true,
             tableIndex: true,
-            dao: new _DAO2.default('/clientServer')
+            dao: new _DAO2.default('/client/server')
         };
     },
     getInitialState: function getInitialState() {
@@ -81,7 +81,7 @@ var Client = React.createClass({
             status: '',
             showModal: false,
             dialog: {},
-            data: [{ id: 1, code: '001', name: 'test1', address: 'address1', contact: 'contact1' }, { id: 2, code: '002', name: 'test2', address: 'address2', contact: 'contact2' }]
+            data: []
         };
     },
     _notificationSystem: null,
@@ -89,10 +89,12 @@ var Client = React.createClass({
     _initAjax: function _initAjax() {
         var self = this;
         $.ajaxSetup({
-            method: 'json',
+            method: 'POST',
+            dataType: 'json',
             dataFilter: function dataFilter(rsp, settings) {
+                rsp = JSON.parse(rsp);
                 if (rsp.success) {
-                    return rsp.data;
+                    return JSON.stringify(rsp.data);
                 } else {
                     self._addNotification({
                         title: ERROR.text,
@@ -126,9 +128,13 @@ var Client = React.createClass({
     },
     _deleteClient: function _deleteClient(client) {
         var dao = this.props.dao;
-
+        var self = this;
         this._dialog.confirm('Are you sure to remove the client' + client.name + ' which could not recover?', function () {
-            dao.delete(client.id);
+            dao.delete(client.id).then(function (result) {
+                dao.read().then(function (data) {
+                    self.setState({ data: data });
+                });
+            });
         });
     },
     _addClient: function _addClient() {
@@ -136,17 +142,26 @@ var Client = React.createClass({
         this.setState({ client: client, status: 'add', showModal: true });
     },
     _confirm: function _confirm() {
+        var _this = this;
+
         var _state = this.state;
         var status = _state.status;
         var client = _state.client;
         var dao = this.props.dao;
 
         if (status === 'add') {
-            dao.create(client);
+            dao.create(client).then(function (result) {
+                dao.read({}).then(function (data) {
+                    _this.setState({ showModal: false, data: data });
+                });
+            });
         } else if (status === 'edit') {
-            dao.update(client);
+            dao.update(client).then(function (result) {
+                dao.read({}).then(function (data) {
+                    _this.setState({ showModal: false, data: data });
+                });
+            });
         }
-        this.setState({ showModal: false });
     },
     _cancel: function _cancel() {
         this.setState({ showModal: false });
@@ -167,9 +182,16 @@ var Client = React.createClass({
     componentDidMount: function componentDidMount() {
         this._notificationSystem = this.refs.notificationSystem;
         this._dialog = this.refs.dialog;
+
+        var dao = this.props.dao;
+
+        var self = this;
+        dao.read().then(function (data) {
+            self.setState({ data: data });
+        });
     },
     render: function render() {
-        var _this = this;
+        var _this2 = this;
 
         var _props = this.props;
         var schema = _props.schema;
@@ -191,9 +213,9 @@ var Client = React.createClass({
                 labelClassName: 'col-md-2',
                 ref: header.key,
                 wrapperClassName: 'col-md-10',
-                bsStyle: _this._validate(header),
+                bsStyle: _this2._validate(header),
                 onChange: function onChange() {
-                    return _this._handleChange(header);
+                    return _this2._handleChange(header);
                 } });
         });
 

@@ -5,9 +5,7 @@ import React from 'react'
 import { Table, Button } from 'react-bootstrap'
 export let ManageTable = React.createClass({
     getInitialState: function() {
-        return {
-            data: this.props.data || []
-        }
+        return {}
     },
     _adminNode: function(row) {
         let { editRow, deleteRow } = this.props
@@ -32,11 +30,10 @@ export let ManageTable = React.createClass({
         }
     },
     render: function() {
-        let { schema, tableAdmin, tableIndex } = this.props
+        let { schema, data, tableAdmin, tableIndex } = this.props
         let theaders = schema.map((key) => key.label)
         tableIndex && theaders.unshift('序号')
         tableAdmin && theaders.unshift('管理')
-        let { data } = this.state
         var headerNodes = theaders.map((header, index) => <th key = {index}>{header}</th>),
             bodyNodes = data.map((d, index) => {
                 let rows = schema.map((key, index) => <td key = {index}>{d[key.key]}</td>)

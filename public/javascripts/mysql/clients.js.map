@@ -1,0 +1,1 @@
+{"version":3,"sources":["clients.jsx"],"names":[],"mappings":";;;;;;;;;;;;;;;IAIqB,SAAS;cAAT,SAAS;;AAC1B,aADiB,SAAS,GACZ;8BADG,SAAS;;sEAAT,SAAS;KAGzB;;WAHgB,SAAS;;;kBAAT,SAAS","file":"clients.js","sourcesContent":["/**\r\n */\r\nimport { DAO } from './DAO'\r\n\r\nexport default class ClientDAO extends DAO {\r\n    constructor() {\r\n        super()\r\n    }\r\n}"]}

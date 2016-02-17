@@ -8,10 +8,9 @@ export default class DAO {
 
     query(options, method) {
         let self = this
-        options.method = method
         return $.ajax({
             url: self.url,
-            data: options
+            data: {method: method, options: JSON.stringify(options || {})}
         });
     }
 

@@ -20,9 +20,7 @@ var ManageTable = exports.ManageTable = _react2.default.createClass({
     displayName: 'ManageTable',
 
     getInitialState: function getInitialState() {
-        return {
-            data: this.props.data || []
-        };
+        return {};
     },
     _adminNode: function _adminNode(row) {
         var _props = this.props;
@@ -66,6 +64,7 @@ var ManageTable = exports.ManageTable = _react2.default.createClass({
 
         var _props2 = this.props;
         var schema = _props2.schema;
+        var data = _props2.data;
         var tableAdmin = _props2.tableAdmin;
         var tableIndex = _props2.tableIndex;
 
@@ -74,8 +73,6 @@ var ManageTable = exports.ManageTable = _react2.default.createClass({
         });
         tableIndex && theaders.unshift('序号');
         tableAdmin && theaders.unshift('管理');
-        var data = this.state.data;
-
         var headerNodes = theaders.map(function (header, index) {
             return _react2.default.createElement(
                 'th',

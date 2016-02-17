@@ -49,7 +49,7 @@ let Client = React.createClass({
             schema: CLIENT_SCHEMA,
             tableAdmin: true,
             tableIndex: true,
-            dao: new DAO('/clientServer')
+            dao: new DAO('/client/server')
         }
     },
     getInitialState: function() {
@@ -59,7 +59,7 @@ let Client = React.createClass({
             status: '',
             showModal: false,
             dialog: {},
-            data: [{id: 1, code: '001', name: 'test1', address: 'address1', contact: 'contact1'},{id: 2, code: '002', name: 'test2', address: 'address2', contact: 'contact2'},]
+            data: []
         }
     },
     _notificationSystem: null,
@@ -67,10 +67,12 @@ let Client = React.createClass({
     _initAjax: function() {
         let self = this
         $.ajaxSetup({
-            method: 'json',
+            method: 'POST',
+            dataType: 'json',
             dataFilter: function(rsp, settings) {
+                rsp = JSON.parse(rsp)
                 if(rsp.success) {
-                    return rsp.data;
+                    return JSON.stringify(rsp.data);
                 } else {
                     self._addNotification({
                         title: ERROR.text,
@@ -101,9 +103,14 @@ let Client = React.createClass({
         this.setState({client: client, status: 'edit', showModal: true})
     },
     _deleteClient: function(client) {
-        let { dao } = this.props
+        let { dao } = this.props,
+            self = this
         this._dialog.confirm('Are you sure to remove the client' + client.name + ' which could not recover?', function(){
-            dao.delete(client.id)
+            dao.delete(client.id).then(result => {
+                dao.read().then(data => {
+                    self.setState({data: data})
+                })
+            })
         })
     },
     _addClient: function() {
@@ -114,11 +121,19 @@ let Client = React.createClass({
         let { status, client } = this.state
         let { dao } = this.props
         if(status === 'add') {
-            dao.create(client)
+            dao.create(client).then(result => {
+                dao.read({}).then(data => {
+                    this.setState({showModal: false, data: data})
+                })
+            })
         } else if(status === 'edit') {
-            dao.update(client)
+            dao.update(client).then(result => {
+                dao.read({}).then(data => {
+                    this.setState({showModal: false, data: data})
+                })
+            })
         }
-        this.setState({showModal: false})
+
     },
     _cancel: function() {
         this.setState({showModal: false})
@@ -138,6 +153,12 @@ let Client = React.createClass({
     componentDidMount: function() {
         this._notificationSystem = this.refs.notificationSystem
         this._dialog = this.refs.dialog
+
+        let { dao } = this.props
+        let self = this
+        dao.read().then(data => {
+            self.setState({data: data})
+        })
     },
     render: function() {
         let { schema, tableAdmin, tableIndex } = this.props

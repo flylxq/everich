@@ -21,10 +21,9 @@ var DAO = (function () {
         key: 'query',
         value: function query(options, method) {
             var self = this;
-            options.method = method;
             return $.ajax({
                 url: self.url,
-                data: options
+                data: { method: method, options: JSON.stringify(options || {}) }
             });
         }
     }, {
