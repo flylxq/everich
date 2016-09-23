@@ -6,7 +6,7 @@ var path = require('path');
 module.exports = {
     context: path.join(__dirname, 'public'),
     entry: {
-        Client: ['./javascripts/client/Client.js']
+        Client: ['./javascripts/client/Client.jsx']
     },
     output: {
         path: path.join(__dirname, 'public/dist/'),
@@ -17,6 +17,14 @@ module.exports = {
             {
                 test: /\.scss$/,
                 loader: 'style!css!sass'
+            },
+            {
+                test: /\.jsx?$/,
+                exclude: /(node_modules|bower_components)/,
+                loader: 'babel', // 'babel-loader' is also a legal name to reference
+                query: {
+                    presets: ['react', 'es2015']
+                }
             }
         ]
     }

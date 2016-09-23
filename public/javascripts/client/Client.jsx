@@ -1,16 +1,16 @@
 /**
  *
  */
+'use strict';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import DAO from '../controller/DAO';
+import { ManageTable } from '../components/Table.jsx';
+import { Dialog } from '../components/Dialog';
+import { Button, Input, Modal } from 'react-bootstrap';
+import NotificationSystem from 'react-notification-system';
 
-import * as React from 'react'
-import * as ReactDOM from 'react-dom'
-import DAO from '../controller/DAO'
-import { ManageTable } from '../components/Table'
-import { Dialog } from '../components/Dialog'
-import { Button, Input, Modal } from 'react-bootstrap'
-import NotificationSystem from 'react-notification-system'
-
-require('../../stylesheets/client.scss')
+require('../../stylesheets/client.scss');
 
 /**
  * key: key's name in source table

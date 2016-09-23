@@ -1,7 +1,7 @@
 /**
  *
  */
-
+'use strict';
 import * as React from 'react'
 import { Button, Modal } from 'react-bootstrap'
 

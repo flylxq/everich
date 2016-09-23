@@ -1,6 +1,7 @@
 /**
  *
  */
+'use strict';
 import React from 'react'
 import { Table, Button } from 'react-bootstrap'
 export let ManageTable = React.createClass({
