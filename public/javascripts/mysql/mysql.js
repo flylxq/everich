@@ -15,7 +15,7 @@ exports.Pool = mysql.createPool({
 });
 
 exports.ProductPool = mysql.createPool({
-    host: '42.96.143.214',
+    host: '118.190.106.148',
     port: '3306',
     database: 'listmg',
     chartset: 'GBK',

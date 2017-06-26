@@ -6,7 +6,9 @@ var path = require('path');
 module.exports = {
     context: path.join(__dirname, 'public'),
     entry: {
-        Client: ['./javascripts/client/Client.jsx']
+        Client: ['./javascripts/client/Client.jsx'],
+        login: ['./javascripts/main/Login.jsx'],
+        index: ['./javascripts/main/index.jsx']
     },
     output: {
         path: path.join(__dirname, 'public/dist/'),
@@ -21,8 +23,9 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 exclude: /(node_modules|bower_components)/,
-                loader: 'babel', // 'babel-loader' is also a legal name to reference
+                loader: 'babel', // 'babel-loader' is also a legal name to reference，
                 query: {
+                    plugins: ["transform-class-properties"],
                     presets: ['react', 'es2015']
                 }
             }

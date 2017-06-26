@@ -1,0 +1,37 @@
+@import 'basic';
+.container-fluid {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.left-container {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid $border-color;
+    box-shadow: 5px 0px 5px $border-color;
+    height: 100%;
+    width: 20%;
+    overflow: hidden;
+
+    .menus {
+        flex: 1 1 auto;
+        overflow-y: auto;
+    }
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    height: 100%;
+
+    .table-container {
+        flex: 1 1 auto;
+        overflow-y: hidden;
+        overflow-x: auto;
+        padding: 0 10px 5px 10px;
+        position: relative;
+    }
+}

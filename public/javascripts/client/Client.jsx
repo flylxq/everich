@@ -6,7 +6,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import DAO from '../controller/DAO';
 import { ManageTable } from '../components/Table.jsx';
-import { Dialog } from '../components/Dialog';
+import { Dialog } from '../components/Dialog.jsx';
 import { Button, Input, Modal } from 'react-bootstrap';
 import NotificationSystem from 'react-notification-system';
 

@@ -26,9 +26,9 @@ exports.Response = class {
     static factory(res, promise, key) {
         let self = this
         promise.then(result => {
-            res.jsonp(self.success(key ? result[key] : result))
+            res.json(self.success(key ? result[key] : result))
         }).catch(err => {
-            res.jsonp(self.error(err))
+            res.json(self.error(err))
         })
     }
 }
