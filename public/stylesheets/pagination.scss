@@ -8,19 +8,19 @@
     > li {
         display: inline-block;
         border: 1px solid #ddd;
-        padding: 6px 12px;
         color: $bgColor;
         background-color: #fff;
         float: left;
-        height: 20px;
-        width: 14px;
         text-align: center;
         cursor: pointer;
 
         > a {
             position: relative;
-            line-height: 20px;
+            display: block;
+            line-height: 40px;
             font-size: 14px;
+            min-width: 40px;
+            height: 40px;
             text-decoration: none;
         }
 
@@ -32,7 +32,6 @@
     > li:hover, > li:focus {
         color: $bgDeepColor;
         background-color: #eee;
-        border-color: #ddd;
     }
 
     > li.disabled {
@@ -44,6 +43,14 @@
     > li.page-active {
         color: #eee;
         background-color: $bgColor;
+        border-top-color: $bgColor;
+        border-bottom-color: $bgColor;
+    }
+
+    > li.break {
+        width: 40px;
+        height: 30px;
+        padding: 5px 0;
     }
 
     > li + li {

@@ -78,8 +78,8 @@ exports.DAO = class {
 
     read(id) {
         let { table } = this;
-        let sql = 'SELECT * FROM ' + table + (id !== undefined ? ' WHERE id = ?' : '')
-        return id === undefined ? this.query(sql) : this.query(sql, [id]);
+        let sql = 'SELECT * FROM ' + table + (id ? ' WHERE id = ?' : '')
+        return id ? this.query(sql) : this.query(sql, [id]);
     }
 
     search(object) {

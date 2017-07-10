@@ -9,7 +9,7 @@ let dao = new DAO('client');
 
 let clientServer = function(req, res, next) {
     let { method, options } = (req.method === 'POST' ? req.body : req.query)
-    options = options ? JSON.parse(options) : null
+    options = options ? JSON.parse(options) : null;
 
     switch(method) {
         case 'create':
@@ -19,7 +19,7 @@ let clientServer = function(req, res, next) {
             Response.factory(res, dao.update(options), 'changedRows')
             break;
         case 'read':
-            Response.factory(res, dao.read(options.id))
+            Response.factory(res, dao.read(options && options.id))
             break;
         case 'delete':
             Response.factory(res, dao.delete(options.id), 'affectedRows')

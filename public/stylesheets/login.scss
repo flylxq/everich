@@ -5,30 +5,21 @@
     height: 100%;
     display: flex;
     justify-content: center;
-    padding-top: 10%;
-    align-items: flex-start;
+    align-items: center;
 
     #login-container {
         width: 50%;
-        min-width: 600px;
+        min-width: 300px;
+        max-width: 500px;
         padding: 20px 0;
 
         .login-header {
+            font-family: "Times New Roman";
             font-size: 60px;
             text-shadow: $basic-shadow;
             font-weight: bold;
             color: $font-color;
             letter-spacing: 10px;
-            text-align: center;
-        }
-
-        .login-sub-header {
-            width: 100%;
-            font-size: 35px;
-            font-weight: normal;
-            color: #1A237E;
-            text-shadow: $basic-shadow;
-            letter-spacing: 5px;
             text-align: center;
         }
 
@@ -40,7 +31,7 @@
         align-items: center;
         width: 100%;
         box-sizing: border-box;
-        padding: 10px 10px;
+        padding: 0 10px;
 
         $labelWidth: 20%;
         .field-label {

@@ -9,18 +9,13 @@ import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
 import LogicalSelector from './components/LogicalSelector.jsx';
 import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
 import SearchIcon from 'material-ui/svg-icons/action/search';
 import AddIcon from 'material-ui/svg-icons/content/add';
-import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import OutputIcon from 'material-ui/svg-icons/file/file-download';
-import Pagination from './components/Pagination.jsx';
 import Snackbar from 'material-ui/Snackbar';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-import CircularProgress from 'material-ui/CircularProgress';
 import { EditDialog, FieldType } from './components/EditDialog.jsx';
-import $ from 'jquery';
+import { DAO } from '../public/javascripts/controller/DAO';
+import { ManageTable } from './components/Table';
 import moment from 'moment';
 
 const KEYS = [
@@ -157,6 +152,7 @@ const KEYS = [
 export default class Products extends React.Component {
     constructor(props) {
         super(props);
+        this.dao = new DAO('/data/products', this.queryError);
     }
 
     state = {
@@ -172,8 +168,7 @@ export default class Products extends React.Component {
         editDialogOpen: false,
         dialogMode: null,
         snackOpen: false,
-        snackMsg: '',
-        containerHeight: '100px'
+        snackMsg: ''
     };
 
     _handleState = (key, value) => {
@@ -228,40 +223,25 @@ export default class Products extends React.Component {
         this.setState({
             loading: true
         });
-        $.ajax({
-            url: '/data/products',
-            method: 'POST',
-            dataType: 'json',
-            data: { pageIndex: activePage },
-            success: (rsp) => {
-                if (rsp.success) {
-                    let { list, pages } = rsp.data;
-                    self.setState({
-                        products: list,
-                        pages: pages,
-                        loading: false,
-                        reload: false
-                    });
-                } else {
-                    self.setState({
-                        snackOpen: true,
-                        snackMsg: rsp.message,
-                        loading: false,
-                        reload: false
-                    });
-                }
-            },
-            fail: (err) => {
-                console.error(err);
-                self.setState({
-                    snackOpen: true,
-                    snackMsg: err,
-                    loading: false,
-                    reload: false
-                });
-            }
+        this.dao.query({pageIndex: activePage}, 'POST', '/data/products').then(rsp => {
+            let { list, pages } = rsp.data;
+            self.setState({
+                products: list,
+                pages: pages,
+                loading: false,
+                reload: false
+            });
         });
-    }
+    };
+
+    queryError = (msg) => {
+        this.setState({
+            snackOpen: true,
+            snackMsg: typeof msg === 'string' ? msg : JSON.stringify(msg),
+            loading: false,
+            reload: false
+        });
+    };
 
     _submit = (product) => {
         console.log(`Submit the product of ${JSON.stringify(product)} to server.`);
@@ -269,42 +249,17 @@ export default class Products extends React.Component {
         self.setState({
             loading: true
         });
-        $.ajax({
-            url: '/data/product/add',
-            data: product,
-            dataType: 'json',
-            method: 'POST',
-            success: rsp => {
-                let state = {
-                    loading: false,
-                    reload: true
-                };
-                if (rsp.success) {
-
-                } else {
-                    state.snackOpen = true;
-                    state.snackMsg = rsp.message;
-                }
-                self.setState(state);
-            },
-            fail: err => {
-                console.error(`Submit product error: ${err}`);
-                self.setState({
-                    snackOpen: true,
-                    snackMessage: err,
-                    loading: false
-                });
-            }
+        this.dao.query(product, 'POST', '/data/product/add').then(rsp => {
+            let state = {
+                loading: false,
+                reload: true
+            };
+            self.setState(state);
         });
     }
 
     componentDidMount() {
         this._getData();
-
-        let height = $(this.refs.container).height();
-        this.setState({
-            containerHeight: `${height - 60}px`
-        });
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -318,7 +273,7 @@ export default class Products extends React.Component {
 
     render() {
         const { localCode, validDate, activePage, pages, snackOpen, snackMsg,
-            products, containerHeight, editDialogOpen, editIndex, loading } = this.state;
+            products, editDialogOpen, editIndex, loading } = this.state;
         let editProduct = products[editIndex];
         const fieldStyle = {
                 width: '150px',
@@ -326,19 +281,10 @@ export default class Products extends React.Component {
             },
             btnStyle = {
                 width: '120px'
-            },
-            headerColumnStyle = {
-                textAlign: 'center',
-                padding: '0 12px',
-                height: '32px'
-            },
-            columnStyle = {
-                textAlign: 'center',
-                padding: '0 12px'
             };
         let width = KEYS.reduce((sum, item) => (item.width ? item.width + 24 + sum : sum), 0);
         return (
-            <div className = 'page'>
+            <div style={{width: '80%', height: '100%', display: 'flex', flexDirection: 'column'}}>
                 <Toolbar style = {{flex: '0 0 56px', width: '100%', backgroundColor: 'rgba(239, 239, 239, .6)'}}>
                     <ToolbarGroup>
                         <ToolbarTitle text = 'Cargo' style = {{color: '#525252'}} />
@@ -373,92 +319,16 @@ export default class Products extends React.Component {
                                       onClick = {this._handleOutputBtn} />
                     </ToolbarGroup>
                 </Toolbar>
-                <Pagination pageNum = {pages}
-                            pageRange = {5}
-                            pageMargin = {1}
-                            activePage = {activePage}
-                            setPage = {key => this._handleState('activePage', key)} />
-                <div className = 'table-container' ref = 'container'>
-                    <Table selectable = {false}
-                           fixedHeader = {true}
-                           height = {containerHeight}
-                           bodyStyle = {{width: `${width}px`}}>
-                        <TableHeader displaySelectAll = {false}
-                                     enableSelectAll = {false}
-                                     adjustForCheckbox = {false}>
-                            <TableRow>
-                                {KEYS.map((item, index) => {
-                                    let { label, width, show } = item,
-                                        style = Object.assign({width: `${width}px`}, headerColumnStyle);
-                                    if(show === false) {
-                                        return;
-                                    }
-                                    return (
-                                        <TableHeaderColumn key = {index} style = {style}>{label}</TableHeaderColumn>
-                                    );
-                                })}
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody displayRowCheckbox = {false}
-                                   stripedRows = {true}
-                                   showRowHover = {true}
-                                   preScanRows = {false}>
-                            {products.map((product, index) => {
-                                return (
-                                    <TableRow key = {index}>
-                                        {KEYS.map((item, i) => {
-                                            let { key, show, width, type } = item,
-                                                style = Object.assign({width: `${width}px`}, columnStyle);
-                                            if (key === 'admin') {
-                                                return (
-                                                    <TableRowColumn key = {i}
-                                                                    style = {style}>
-                                                        <FlatButton icon = {<EditIcon />}
-                                                                    label = '编辑'
-                                                                    primary = {true}
-                                                                    onClick = {() => this._handleEditBtn(i)} />
-                                                        <FlatButton icon = {<DeleteIcon />}
-                                                                    label = '删除'
-                                                                    secondary = {true}
-                                                                    onClick = {() => this._handleDeleteBtn(i)} />
-                                                    </TableRowColumn>
-                                                );
-                                            } else if (key === 'index') {
-                                                return (
-                                                    <TableRowColumn key = {i}
-                                                                    style = {style}>{index + 1}</TableRowColumn>
-                                                );
-                                            } else if (show !== false) {
-                                                let value = product[key];
-                                                if (type === 'YYYY-MM-DD') {
-                                                    value = moment(new Date(value)).format(type);
-                                                }
-
-                                                return (
-                                                    <TableRowColumn key = {i}
-                                                                    style = {style}>{value}</TableRowColumn>
-                                                );
-                                            }
-                                        })}
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                    <div className = 'table-loading' style = {{
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        zIndex: 20,
-                        width: '100%',
-                        height: '100%',
-                        display: loading ? 'flex' : 'none',
-                        backgroundColor: 'rgba(32, 32, 32, .5)',
-                        justifyContent: 'center',
-                        alignItems: 'center'}}>
-                        {loading && <CircularProgress size = {80} thickness = {6} /> }
-                    </div>
-                </div>
+                <ManageTable pages={pages}
+                             activePage = {activePage}
+                             setPage = {key => this._handleState('activePage', key)}
+                             data={products}
+                             schema={KEYS}
+                             editRow={this._handleEditBtn}
+                             deleteRow={this._handleDeleteBtn}
+                             dataAdmin={true}
+                             tableIndex={true}
+                             styleColor={'#525252'} />
                 <EditDialog data = {editProduct}
                             open = {editDialogOpen}
                             keys = {KEYS}

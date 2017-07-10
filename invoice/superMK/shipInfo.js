@@ -258,12 +258,12 @@ function deltr(dom){
 }
 
 function getTotal(data) {
-    return parseInt(data[i]['O_SYDNEY']) +
-        parseInt(data[i]['O_MELBOURNE']) +
-        parseInt(data[i]['O_BRISBANE']) +
-        parseInt(data[i]['O_PERTH']) +
-        parseInt(data[i]['O_AUCKLAND']) +
-        parseInt(data[i]['lyt']);
+    return parseInt(data['O_SYDNEY']) +
+        parseInt(data['O_MELBOURNE']) +
+        parseInt(data['O_BRISBANE']) +
+        parseInt(data['O_PERTH']) +
+        parseInt(data['O_AUCKLAND']) +
+        parseInt(data['lyt']);
 }
 
 function showHint(str, $input){
